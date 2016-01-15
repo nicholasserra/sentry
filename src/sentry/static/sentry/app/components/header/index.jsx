@@ -32,6 +32,9 @@ const Header = React.createClass({
             <a href="/" className="logo">{logo}</a>
           }
           <OrganizationSelector organization={this.getOrganization()} className="pull-right" />
+          <div className="onboarding-progress-bar">
+            <div className="slider"></div>
+          </div>
         </div>
       </header>
     );
