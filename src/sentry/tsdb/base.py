@@ -50,9 +50,19 @@ class TSDBModel(Enum):
 
     # distinct count of users that have been affected by an event in a group
     users_affected_by_group = 300
-
     # distinct count of users that have been affected by an event in a project
     users_affected_by_project = 301
+
+    # number of events sent to server for an organization (key is always 0)
+    frequent_organization_received_by_system = 400
+    # number of events rejected by server for an organization (key is always 0)
+    frequent_organization_rejected_by_system = 401
+    # number of events blacklisted by server for an organization (key is always 0)
+    frequent_organization_blacklisted_by_system = 402
+    # number of events seen for a project, by organization
+    frequent_projects_by_organization = 403
+    # number of issues seen for a project, by project
+    frequent_issues_by_project = 404
 
 
 class BaseTSDB(object):
@@ -219,5 +229,29 @@ class BaseTSDB(object):
     def get_distinct_counts_totals(self, model, keys, start, end=None, rollup=None):
         """
         Count distinct items during a time range.
+        """
+        raise NotImplementedError
+
+    def record_frequency_multi(self, requests, timestamp=None):
+        """
+        Record items in a frequency table.
+        """
+        raise NotImplementedError
+
+    def get_most_frequent(self, model, keys, start, end=None, rollup=None):
+        """
+        Retrieve the most frequently seen items in a frequency table.
+        """
+        raise NotImplementedError
+
+    def get_frequency_series(self, model, items, start, end=None, rollup=None):
+        """
+        Retrieve the frequency of known items in a table over time.
+        """
+        raise NotImplementedError
+
+    def get_frequency_totals(self, model, items, start, end=None, rollup=None):
+        """
+        Retrieve the total frequency of known items in a table over time.
         """
         raise NotImplementedError
