@@ -392,6 +392,17 @@ table.project-list {
            border-color: #48D887;
          }
        }
+
+       &:hover {
+         .skip-btn {
+           opacity: .85;
+           visibility: visible;
+
+           &:hover {
+             opacity: 1;
+           }
+         }
+       }
      }
    }
 
@@ -410,6 +421,17 @@ table.project-list {
       position: relative;
       top: 7px;
     }
+  }
+
+  .skip-btn {
+
+    position: absolute;
+    z-index: 1000;
+    right: 5px;
+    top: 2px;
+    .transition(opacity .1s);
+    opacity: 0;
+    visibility: hidden;
   }
 }
 
@@ -453,12 +475,12 @@ table.project-list {
       box-shadow: none;
       zoom: .9;
 
-      a {
+      a:not(.btn) {
         color: @link-color;
 
         &:hover {
           color: @link-color-hover;
-          background: transparent;
+          background: #fff;
         }
       }
     }
