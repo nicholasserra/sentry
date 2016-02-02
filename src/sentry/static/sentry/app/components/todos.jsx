@@ -6,6 +6,15 @@ import OrganizationState from '../mixins/organizationState';
 
 const TODOS = [
   {
+    'task': 0,
+    'title': 'Make a great decision',
+    'description': 'By being here, you\'ve done it. Welcome to Sentry!',
+    'skippable': false,
+    'feature_location': 'project',
+    'location': 'settings/install/',
+    'status': 'Complete',
+  },
+  {
     'task': 1,
     'title': 'Send your first event',
     'description': 'Install Sentry\'s client to get started error logging',
@@ -77,7 +86,7 @@ const TODOS = [
   //   'feature_location': 'project',
   //   'location': 'settings/user-reports/'
   // },
-]
+];
 
 const TodoItem = React.createClass({
   mixins: [OrganizationState],
@@ -135,7 +144,7 @@ const TodoItem = React.createClass({
           </div>
           <h4>{ this.props.task['title'] }</h4>
           <p>
-            { this.props.task['description'] } &middot; <span><a href={learn_more_url}>Learn more</a></span>
+            { this.props.task['description'] }
           </p>
           { this.props.task['skippable'] && this.props.task['status'] != 'Skipped' && this.props.task['status'] != 'Complete' && !this.state.showConfirmation ? <a className="skip-btn btn btn-default" onClick={this.toggleConfirmation}>Skip</a> : null }
         </div>
@@ -182,8 +191,12 @@ const Todos = React.createClass({
   componentWillMount() {
     let org = this.getOrganization();
     let tasks = [];
-    for (var task of TODOS) {
-      task['status'] = '';
+
+    for (var task of TASKS) {
+      task.status = '';
+      if (task.task == '0') {
+        task.status = 'Complete';
+      }
       for (var server_task of org.onboardingTasks) {
         if (server_task['task'] == task['task']) {
           task['status'] = server_task['status'];
@@ -192,7 +205,7 @@ const Todos = React.createClass({
       }
       tasks.push(task);
     }
-    this.setState({tasks: tasks})
+    this.setState({tasks: tasks});
   },
 
   skipTask(skipped_task) {
@@ -202,7 +215,9 @@ const Todos = React.createClass({
       data: {'task': skipped_task, 'status': 'Skipped'},
       success: () => {
         let new_state = this.state.tasks.map( (task) => {
-          if (task['task'] == skipped_task) { task['status'] = 'Skipped' };
+          if (task['task'] == skipped_task) {
+            task['status'] = 'Skipped';
+          }
           return task;
         });
         this.setState({tasks: new_state});
@@ -214,6 +229,7 @@ const Todos = React.createClass({
     this.getOnboardingTasks();
   },
 
+<<<<<<< HEAD
   click(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -237,6 +253,11 @@ const Todos = React.createClass({
 
     let todo_list = next_tasks.map( (task) => {
       return (<TodoItem key={task['task']} task={task} onSkip={this.skipTask} />)
+=======
+  render: function() {
+    let todo_list = this.state.tasks.map(function(task) {
+      return (<TodoItem key={task['task']} task={task} onSkip={this.skipTask} />);
+>>>>>>> 3fbee56ce2a9d55d728d702e77b808d23531036f
     }, this);
 
     return (
