@@ -4,7 +4,7 @@ import ApiMixin from '../mixins/apiMixin';
 import ConfigStore from '../stores/configStore';
 import OrganizationState from '../mixins/organizationState';
 
-const TODOS = [
+const TASKS = [
   {
     'task': 0,
     'title': 'Make a great decision',
@@ -229,7 +229,6 @@ const Todos = React.createClass({
     this.getOnboardingTasks();
   },
 
-<<<<<<< HEAD
   click(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -253,11 +252,6 @@ const Todos = React.createClass({
 
     let todo_list = next_tasks.map( (task) => {
       return (<TodoItem key={task['task']} task={task} onSkip={this.skipTask} />)
-=======
-  render: function() {
-    let todo_list = this.state.tasks.map(function(task) {
-      return (<TodoItem key={task['task']} task={task} onSkip={this.skipTask} />);
->>>>>>> 3fbee56ce2a9d55d728d702e77b808d23531036f
     }, this);
 
     return (
