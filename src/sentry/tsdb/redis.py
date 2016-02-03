@@ -48,10 +48,11 @@ class RedisTSDB(BaseTSDB):
     """
     A time series storage backend for Redis.
 
-    The time series API supports two data types:
+    The time series API supports three data types:
 
         * simple counters
         * distinct counters (number of unique elements seen)
+        * frequency tables (a set of items ranked by most frequently observed)
 
     The backend also supports virtual nodes (``vnodes``) which controls shard
     distribution. This value should be set to the anticipated maximum number of
@@ -80,6 +81,22 @@ class RedisTSDB(BaseTSDB):
             ...
         }
 
+    Frequency tables are modeled using two data structures:
+
+        * top-N index: a sorted set containing the most frequently observed items,
+        * estimation matrix: a hash table containing counters, used in a Count-Min sketch
+
+    Member scores are 100% accurate until the index is filled (and no memory is
+    used for the estimation matrix until this point), after which the data
+    structure switches to a probabilistic implementation and accuracy begins to
+    degrade for less frequently observed items, but remains accurate for more
+    frequently observed items.
+
+    Frequency tables are especially useful when paired with a (non-distinct)
+    counter of the total number of observations so that scores of items of the
+    frequency table can be displayed as percentages of the whole data set.
+    (Additional documentation and the bulk of the logic for implementing the
+    frequency table API can be found in the ``cmsketch.lua`` script.)
     """
     DEFAULT_SKETCH_PARAMETERS = SketchParameters(3, 128, 50)
 

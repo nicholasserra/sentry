@@ -235,23 +235,47 @@ class BaseTSDB(object):
     def record_frequency_multi(self, requests, timestamp=None):
         """
         Record items in a frequency table.
+
+        Metrics to increment should be passed as sequence pairs, using this
+        structure: ``(model, {key: {item: score, ...}, ...})``
         """
         raise NotImplementedError
 
     def get_most_frequent(self, model, keys, start, end=None, rollup=None):
         """
         Retrieve the most frequently seen items in a frequency table.
+
+        Results are returned as a mapping, where the key is the key requested
+        and the value is a list of ``(member, score)`` tuples, ordered by the
+        highest (most frequent) to lowest (least frequent) score. The maximum
+        number of items returned is ``index capacity * rollup intervals``.
         """
         raise NotImplementedError
 
     def get_frequency_series(self, model, items, start, end=None, rollup=None):
         """
         Retrieve the frequency of known items in a table over time.
+
+        The items requested should be passed as a mapping, where the key is the
+        metric key, and the value is a sequence of members to retrieve scores
+        for.
+
+        Results are returned as a mapping, where the key is the key requested
+        and the value is a list of ``(timestamp, {item: score, ...})`` pairs
+        over the series.
         """
         raise NotImplementedError
 
     def get_frequency_totals(self, model, items, start, end=None, rollup=None):
         """
         Retrieve the total frequency of known items in a table over time.
+
+        The items requested should be passed as a mapping, where the key is the
+        metric key, and the value is a sequence of members to retrieve scores
+        for.
+
+        Results are returned as a mapping, where the key is the key requested
+        and the value is a mapping of ``{item: score, ...}`` containing the
+        total score of items over the interval.
         """
         raise NotImplementedError
