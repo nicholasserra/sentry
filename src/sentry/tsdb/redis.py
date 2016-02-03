@@ -335,18 +335,22 @@ class RedisTSDB(BaseTSDB):
 
         self.cluster.execute_commands(commands)
 
-    def get_most_frequent(self, model, keys, start, end=None, rollup=None):
+    def get_most_frequent(self, model, keys, start, end=None, rollup=None, limit=None):
         # TODO: Limit support!
 
         rollup, series = self.get_optimal_rollup_series(start, end, rollup)
 
         commands = {}
 
+        arguments = ['RANKED']
+        if limit is not None:
+            arguments.append(int(limit))
+
         for key in keys:
             ks = []
             for timestamp in series:
                 ks.extend(self.make_frequency_table_keys(model, rollup, timestamp, key))
-            commands[key] = [(CountMinScript, ks, ('RANKED',))]
+            commands[key] = [(CountMinScript, ks, arguments)]
 
         results = {}
 

@@ -130,7 +130,7 @@ class InMemoryTSDB(BaseTSDB):
                 for rollup, _ in self.rollups:
                     source[self.normalize_to_rollup(timestamp, rollup)].update(items)
 
-    def get_most_frequent(self, model, keys, start, end=None, rollup=None):
+    def get_most_frequent(self, model, keys, start, end=None, rollup=None, limit=None):
         rollup, series = self.get_optimal_rollup_series(start, end, rollup)
 
         results = {}
@@ -141,7 +141,7 @@ class InMemoryTSDB(BaseTSDB):
                 result.update(source[self.normalize_ts_to_rollup(timestamp, rollup)])
 
         for key, counter in results.items():
-            results[key] = counter.most_common()
+            results[key] = counter.most_common(limit)
 
         return results
 

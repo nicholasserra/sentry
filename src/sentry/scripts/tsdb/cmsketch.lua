@@ -500,7 +500,9 @@ return Router:new({
 
             if #sketches == 1 then
                 local results = {}
-                local members = redis.call('ZREVRANGE', sketches[1].index, 0, limit, 'WITHSCORES')
+                -- Note that the ZREVRANGE bounds are *inclusive*, so the limit
+                -- needs to be reduced by one to act as a typical slice bound.
+                local members = redis.call('ZREVRANGE', sketches[1].index, 0, limit - 1, 'WITHSCORES')
                 for i=1, #members, 2 do
                     table.insert(
                         results,
@@ -559,7 +561,6 @@ return Router:new({
                         string.format('%s', score)
                     }
                 end
-
                 return trimmed
             end
         end,

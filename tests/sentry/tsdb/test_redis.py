@@ -201,6 +201,18 @@ class RedisTSDBTest(TestCase):
         assert self.db.get_most_frequent(
             model,
             ('organization:1', 'organization:2'),
+            now,
+            limit=1,
+        ) == {
+            'organization:1': [
+                ('project:3', 3.0),
+            ],
+            'organization:2': [],
+        }
+
+        assert self.db.get_most_frequent(
+            model,
+            ('organization:1', 'organization:2'),
             now - timedelta(hours=1),
             now,
         ) == {

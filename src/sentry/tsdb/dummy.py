@@ -32,7 +32,7 @@ class DummyTSDB(BaseTSDB):
     def record_frequency_multi(self, requests, timestamp=None):
         pass
 
-    def get_most_frequent(self, model, keys, start, end=None, rollup=None):
+    def get_most_frequent(self, model, keys, start, end=None, rollup=None, limit=None):
         return {key: [] for key in keys}
 
     def get_frequency_series(self, model, items, start, end=None, rollup=None):

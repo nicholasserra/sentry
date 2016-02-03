@@ -243,14 +243,15 @@ class BaseTSDB(object):
         """
         raise NotImplementedError
 
-    def get_most_frequent(self, model, keys, start, end=None, rollup=None):
+    def get_most_frequent(self, model, keys, start, end=None, rollup=None, limit=None):
         """
         Retrieve the most frequently seen items in a frequency table.
 
         Results are returned as a mapping, where the key is the key requested
         and the value is a list of ``(member, score)`` tuples, ordered by the
         highest (most frequent) to lowest (least frequent) score. The maximum
-        number of items returned is ``index capacity * rollup intervals``.
+        number of items returned is ``index capacity * rollup intervals`` if no
+        ``limit`` is provided.
         """
         raise NotImplementedError
 
