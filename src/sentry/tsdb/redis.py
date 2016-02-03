@@ -336,8 +336,6 @@ class RedisTSDB(BaseTSDB):
         self.cluster.execute_commands(commands)
 
     def get_most_frequent(self, model, keys, start, end=None, rollup=None, limit=None):
-        # TODO: Limit support!
-
         rollup, series = self.get_optimal_rollup_series(start, end, rollup)
 
         commands = {}
