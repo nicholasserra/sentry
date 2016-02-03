@@ -20,7 +20,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from sentry.app import buffer
+from sentry.app import buffer, tsdb
 from sentry.constants import (
     DEFAULT_LOGGER_NAME, LOG_LEVELS, MAX_CULPRIT_LENGTH, EVENT_ORDERING_KEY,
 )
@@ -58,12 +58,16 @@ class GroupManager(BaseManager):
         project_id = group.project_id
         date = group.last_seen
 
-        for tag_item in tags:
-            if len(tag_item) == 2:
-                (key, value), data = tag_item, None
+        def normalize(item):
+            if len(item) == 2:
+                (key, value), data = item, None
             else:
-                key, value, data = tag_item
+                key, value, data = item
+            return key, value, data
 
+        tags = map(normalize, tags)
+
+        for key, value, data in tags:
             buffer.incr(TagValue, {
                 'times_seen': 1,
             }, {
@@ -85,6 +89,18 @@ class GroupManager(BaseManager):
             }, {
                 'last_seen': date,
             })
+
+        metrics = {}
+        for key, value, data in tags:
+            metric = metrics.setdefault(u'{}:{}'.format(group.id, key), {})
+            metric[value] = metric.get(value, 0.0) + 1.0
+
+        # XXX: No access to the event where the tags were recorded here, this
+        # assumes ``last_seen`` is updated before this function is called!!!
+        tsdb.record_frequency_multi(
+            ((tsdb.models.frequent_values_by_issue_tag, metrics),),
+            timestamp=group.last_seen
+        )
 
 
 class Group(Model):

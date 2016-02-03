@@ -63,6 +63,8 @@ class TSDBModel(Enum):
     frequent_projects_by_organization = 403
     # number of issues seen for a project, by project
     frequent_issues_by_project = 404
+    # number of issues seen for a tag value, by issue:tag
+    frequent_values_by_issue_tag = 405
 
 
 class BaseTSDB(object):
