@@ -394,8 +394,9 @@ table.project-list {
        }
 
        &.skipped {
-        .ob-checkbox {
-          border-color: grey;
+        h4 {
+          color: @gray-light;
+          text-decoration: line-through;
         }
        }
 
@@ -436,6 +437,14 @@ table.project-list {
       left: 8px;
       position: relative;
       top: 7px;
+    }
+
+    .icon-x {
+      color: @gray-lightest;
+      font-size: 26px;
+      left: 8px;
+      position: relative;
+      top: 8px;
     }
   }
 
