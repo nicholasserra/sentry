@@ -28,11 +28,11 @@ class RedisTSDBTest(TestCase):
         with self.db.cluster.all() as client:
             client.flushdb()
 
-    def test_make_key(self):
-        result = self.db.make_key(TSDBModel.project, 1368889980, 1)
+    def test_make_counter_key(self):
+        result = self.db.make_counter_key(TSDBModel.project, 1368889980, 1)
         assert result == 'ts:1:1368889980:1'
 
-        result = self.db.make_key(TSDBModel.project, 1368889980, 'foo')
+        result = self.db.make_counter_key(TSDBModel.project, 1368889980, 'foo')
         assert result == 'ts:1:1368889980:33'
 
     def test_get_model_key(self):

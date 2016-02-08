@@ -113,7 +113,22 @@ class RedisTSDB(BaseTSDB):
             label='TSDB',
         )
 
-    def make_key(self, model, epoch, model_key):
+    def make_key(self, model, rollup, timestamp, key):
+        """
+        Make a key that is used for distinct counter and frequency table
+        values.
+        """
+        return '{prefix}{model}:{epoch}:{key}'.format(
+            prefix=self.prefix,
+            model=model.value,
+            epoch=self.normalize_ts_to_rollup(timestamp, rollup),
+            key=self.get_model_key(key),
+        )
+
+    def make_counter_key(self, model, epoch, model_key):
+        """
+        Make a key that is used for counter values.
+        """
         if isinstance(model_key, six.integer_types):
             vnode = model_key % self.vnodes
         else:
@@ -141,7 +156,7 @@ class RedisTSDB(BaseTSDB):
 
         >>> incr_multi([(TimeSeriesModel.project, 1), (TimeSeriesModel.group, 5)])
         """
-        make_key = self.make_key
+        make_key = self.make_counter_key
         normalize_to_rollup = self.normalize_to_rollup
         if timestamp is None:
             timestamp = timezone.now()
@@ -171,7 +186,7 @@ class RedisTSDB(BaseTSDB):
         """
         normalize_to_epoch = self.normalize_to_epoch
         normalize_to_rollup = self.normalize_to_rollup
-        make_key = self.make_key
+        make_key = self.make_counter_key
 
         if rollup is None:
             rollup = self.get_optimal_rollup(start, end)
@@ -199,14 +214,6 @@ class RedisTSDB(BaseTSDB):
             results_by_key[key] = sorted(points.items())
         return dict(results_by_key)
 
-    def make_distinct_counter_key(self, model, rollup, timestamp, key):
-        return '{prefix}{model}:{epoch}:{key}'.format(
-            prefix=self.prefix,
-            model=model.value,
-            epoch=self.normalize_ts_to_rollup(timestamp, rollup),
-            key=self.get_model_key(key),
-        )
-
     def record(self, model, key, values, timestamp=None):
         self.record_multi(((model, key, values),), timestamp)
 
@@ -223,7 +230,7 @@ class RedisTSDB(BaseTSDB):
             for model, key, values in items:
                 c = client.target_key(key)
                 for rollup, max_values in self.rollups:
-                    k = self.make_distinct_counter_key(
+                    k = self.make_key(
                         model,
                         rollup,
                         ts,
@@ -254,7 +261,7 @@ class RedisTSDB(BaseTSDB):
                     r.append((
                         timestamp,
                         c.pfcount(
-                            self.make_distinct_counter_key(
+                            self.make_key(
                                 model,
                                 rollup,
                                 timestamp,
@@ -282,14 +289,14 @@ class RedisTSDB(BaseTSDB):
                 # directly here instead.
                 ks = []
                 for timestamp in series:
-                    ks.append(self.make_distinct_counter_key(model, rollup, timestamp, key))
+                    ks.append(self.make_key(model, rollup, timestamp, key))
 
                 responses[key] = client.target_key(key).execute_command('PFCOUNT', *ks)
 
         return {key: value.value for key, value in responses.iteritems()}
 
     def make_frequency_table_keys(self, model, rollup, timestamp, key):
-        prefix = self.make_distinct_counter_key(model, rollup, timestamp, key)
+        prefix = self.make_key(model, rollup, timestamp, key)
         return map(
             operator.methodcaller('format', prefix),
             ('{}:c', '{}:i', '{}:e'),
