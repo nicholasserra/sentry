@@ -7,11 +7,9 @@ sentry.tsdb.inmemory
 """
 from __future__ import absolute_import
 
-from collections import (
-    Counter,
-    defaultdict
-)
+from collections import Counter, defaultdict
 from datetime import timedelta
+
 from django.utils import timezone
 
 from sentry.tsdb.base import BaseTSDB

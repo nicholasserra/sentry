@@ -13,7 +13,6 @@ from enum import Enum
 
 from sentry.utils.dates import to_timestamp
 
-
 ONE_MINUTE = 60
 ONE_HOUR = ONE_MINUTE * 60
 ONE_DAY = ONE_HOUR * 24

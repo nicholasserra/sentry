@@ -7,30 +7,23 @@ sentry.tsdb.redis
 """
 from __future__ import absolute_import
 
-import operator
 import logging
-import six
-
+import operator
 from binascii import crc32
-from collections import (
-    defaultdict,
-    namedtuple,
-)
+from collections import defaultdict, namedtuple
 from datetime import timedelta
+from hashlib import md5
+
+import six
 from django.conf import settings
 from django.utils import timezone
-from hashlib import md5
+from pkg_resources import resource_string
 from redis.client import Script
 
-from pkg_resources import resource_string
 from sentry.tsdb.base import BaseTSDB
 from sentry.utils.dates import to_timestamp
-from sentry.utils.redis import (
-    check_cluster_versions,
-    make_rb_cluster,
-)
+from sentry.utils.redis import check_cluster_versions, make_rb_cluster
 from sentry.utils.versioning import Version
-
 
 logger = logging.getLogger(__name__)
 
